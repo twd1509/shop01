@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demoShop.mapper.MemberMapper">
+	<!--전체 회원 조회-->
+	<select id="selectAllMember" resultType="com.example.demoShop.dto.MemberDTO">
+		SELECT * FROM member
+	</select>
+	<!--회원 가입-->
+	<insert id="insertMember">
+		<![CDATA[
+			INSERT INTO member (name, password, email, post_num, address1, address2, phone, grade, reg_date, upt_date, state) 
+			VALUES (#{name}, #{password}, #{email}, #{post_num}, #{address1}, #{address2}, #{phone}, #{grade}, now(), now(), ‘Y’)
+		]]>
+	</insert>
+	<!--로그인-->
+	<select id="loginMember" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[
+			SELECT * FROM member WHERE email = #{email} AND password = #{password}
+		]]>
+	</select>
+</mapper>

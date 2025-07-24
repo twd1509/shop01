@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demoShop.mapper.CategoryMapper">
+	<insert id="insertCategory">
+		<![CDATA[
+			INSERT INTO category (member_no, id, group_no, ref_no, depth, title, state, reg_date, upt_date) 
+			VALUES (#{member_no}, #{id}, #{group_no}, #{ref_no}, #{depth}, #{title}, ‘Y’, now(), now())
+		]]>
+	</insert>
+	<select id="selectAllCategory" resultType="com.example.demoShop.dto.CategoryDTO">
+		SELECT * FROM category
+	</select>
+</mapper>
