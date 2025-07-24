@@ -5,6 +5,50 @@
 	<select id="selectAllMember" resultType="com.example.demoShop.dto.MemberDTO">
 		SELECT * FROM member
 	</select>
+	<!--회원 조회(no)-->
+	<select id="selectMemberByNo" resultType="com.example.demoShop.dto.MemberDTO">
+		SELECT * FROM member WHERE no = #{no}
+	</select>
+	<!--회원 조회(이름)-->
+	<select id="selectMemberByName" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[ 
+			SELECT * FROM member WHERE REPLACE(name, ' ', '') LIKE CONCAT(‘%’, #{name}, ‘%’)
+		]]>
+	</select>
+	<!--회원 조회(이메일)-->
+	<select id="selectMemberByEmail" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[
+			SELECT * FROM member WHERE email LIKE CONCAT(‘%’, #{email}, ‘%’)
+		]]>
+	</select>
+	<!--회원 조회(휴대폰)-->
+	<select id="selectMemberByPhone" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[
+			SELECT * FROM member WHERE REPLACE(phone, '-', '') LIKE CONCAT(‘%’, #{phone}, ‘%’)
+		]]>
+	</select>
+	<!--회원 조회(전체)-->
+	<select id="selectMember" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[
+			SELECT * FROM member 
+			WHERE REPLACE(name, ‘ ‘ , ‘’) LIKE CONCAT(‘%’, #{name}, ‘%’) 
+			OR email LIKE CONCAT(‘%’, #{email}, ‘%’)
+		]]>
+	</select>
+	<!--이메일 중복 체크-->
+	<select id="checkEmail" resultType="int">
+		SELECT COUNT(*) FROM member WHERE email = #{email}
+	</select>
+	<!--휴대폰 중복 체크-->
+	<select id="checkPhone" resultType="int">
+		SELECT COUNT(*) FROM member WHERE phone = #{phone}
+	</select>
+	<!--회원 조회(등급)-->
+	<select id="selectMemberByGrade" resultType="com.example.demoShop.dto.MemberDTO">
+		<![CDATA[
+			SELECT * FROM member WHERE grade = #{grade}
+		]]>
+	</select>
 	<!--회원 가입-->
 	<insert id="insertMember">
 		<![CDATA[
@@ -12,10 +56,30 @@
 			VALUES (#{name}, #{password}, #{email}, #{post_num}, #{address1}, #{address2}, #{phone}, #{grade}, now(), now(), ‘Y’)
 		]]>
 	</insert>
+	<!--회원 정보 수정-->
+	<update id="updateMember">
+		<![CDATA[
+			UPDATE member 
+			SET name = #{name}, password = #{password}, email = #{email}, post_num = #{post_num}, address1 = #{address1}, address2 = #{address2}, phone = #{phone}, grade = #{grade}, upt_date = now(), state = #{state} 
+			WHERE no = #{no}
+		]]>
+	</update>
+	<!--회원 탈퇴-->
+	<delete id="deleteMember">
+		DELETE FROM member WHERE no = #{no}
+	</delete>
 	<!--로그인-->
 	<select id="loginMember" resultType="com.example.demoShop.dto.MemberDTO">
 		<![CDATA[
 			SELECT * FROM member WHERE email = #{email} AND password = #{password}
 		]]>
+	</select>
+	<!--아이디 찾기-->
+	<select id="findMemberByEmail" resultType="com.example.demoShop.dto.MemberDTO">
+		SELECT * FROM member WHERE phone = #{phone} AND name = #{name}
+	</select>
+	<!--비밀번호 찾기-->
+	<select id="findMemberByPw" resultType="com.example.demoShop.dto.MemberDTO">
+		SELECT * FROM member WHERE phone = #{phone} AND name = #{name} AND email = #{email}
 	</select>
 </mapper>

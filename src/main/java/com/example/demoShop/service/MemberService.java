@@ -15,15 +15,78 @@ public class MemberService {
 		this.mbrMapper = mbrMapper;
 	}
 	
-	public int insertMember(MemberDTO mbrVo) {
-		return mbrMapper.insertMember(mbrVo);
+	//회원 가입
+	public int insertMember(MemberDTO mbrDto) {
+		return mbrMapper.insertMember(mbrDto);
 	}
 	
+	//이메일 중복 확인
+	public boolean checkEmail(String email) {
+		return mbrMapper.checkEmail(email) > 0;
+	}
+	
+	//휴대폰 중복 확인
+	public boolean checkPhone(String phone) {
+		return mbrMapper.checkPhone(phone) > 0;
+	}
+	
+	//전체 회원 조회
 	public List<MemberDTO> selectAllMember() {
 		return mbrMapper.selectAllMember();
 	}
 	
+	//회원 조회
+	public List<MemberDTO> selectMember(String searchType, String keyword) {
+		List<MemberDTO> result = null;
+		keyword = keyword.replace(" ", "");
+		
+		switch (searchType) {
+		case "email": 
+			result = mbrMapper.selectMemberByEmail(keyword);
+			break;
+		case "name":
+			result = mbrMapper.selectMemberByName(keyword);
+			break;
+		case "phone":
+			keyword = keyword.replace("-", "");
+			result = mbrMapper.selectMemberByPhone(keyword);
+			break;
+		case "grade":
+			result = mbrMapper.selectMemberByGrade(Integer.parseInt(keyword));
+			break;
+		case "no":
+			result = mbrMapper.selectMemberByNo(Integer.parseInt(keyword));
+			break;
+		default:
+			result = mbrMapper.selectMember(keyword);
+			break;
+		}
+		
+		return result;
+	}
+	
+	//회원 수정
+	public int updateMember(MemberDTO mbrDto) {
+		return mbrMapper.updateMember(mbrDto);
+	}
+	
+	//회원 탈퇴
+	public int deleteMember(int no) {
+		return mbrMapper.deleteMember(no);
+	}
+	
+	//로그인
 	public MemberDTO loginMember(String email, String password) {
 		return mbrMapper.loginMember(email, password);
+	}
+	
+	//아이디 찾기
+	public MemberDTO findMemberByEmail(String phone, String name) {
+		return mbrMapper.findMemberByEmail(phone, name);
+	}
+	
+	//비밀번호 찾기
+	public MemberDTO findMemberByPw(String phone, String name, String email) {
+		return mbrMapper.findMemberByPw(phone, name, email);
 	}
 }

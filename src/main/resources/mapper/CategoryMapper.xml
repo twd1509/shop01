@@ -1,13 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demoShop.mapper.CategoryMapper">
+	<!--카테고리 등록-->
 	<insert id="insertCategory">
 		<![CDATA[
 			INSERT INTO category (member_no, id, group_no, ref_no, depth, title, state, reg_date, upt_date) 
 			VALUES (#{member_no}, #{id}, #{group_no}, #{ref_no}, #{depth}, #{title}, ‘Y’, now(), now())
 		]]>
 	</insert>
+	<!--전체 카테고리 조회-->
 	<select id="selectAllCategory" resultType="com.example.demoShop.dto.CategoryDTO">
 		SELECT * FROM category
 	</select>
+	<!--카테고리 검색(카테고리명)-->
+	<select id="selectCategoryByTitle" resultType="com.example.demoShop.dto.CategoryDTO">
+		<![CDATA[
+			SELECT * FROM category WHERE REPLACE(title, ' ', '') CONCAT (’%’, #{title}, ‘%’)
+		]]>
+	</select>
+	<!--카테고리 검색(ID)-->
+	<select id="selectCategoryById" resultType="com.example.demoShop.dto.CategoryDTO">
+		<![CDATA[
+			SELECT * FROM category WHERE id CONCAT (’%’, #{id}, ‘%’)
+		]]>
+	</select>
+	<!--카테고리 수정-->
+	<update id="updateCategory">
+		<![CDATA[
+			UPDATE category 
+			SET id = #{id}, group_no = #{group_no}, ref_no = #{ref_no}, depth = #{depth}, title = #{title}, state = #{state}, upt_date = now() 
+			WHERE no = #{no}
+		]]>
+	</update>
+	<!--카테고리 삭제-->
+	<delete id="deleteCategory">
+		DELETE FROM category WHERE no = #{no}
+	</delete>
 </mapper>

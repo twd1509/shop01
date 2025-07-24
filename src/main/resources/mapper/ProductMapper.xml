@@ -1,13 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demoShop.mapper.ProductMapper">
+	<!--전체 상품 조회-->
 	<select id="selectAllProduct" resultType="com.example.demoShop.dto.ProductDTO">
 		SELECT * FROM product
 	</select>
+	<!--상품 검색(상품명)-->
+	<select id="selectProductByTitle" resultType="com.example.demoShop.dto.ProductDTO">
+		<![CDATA[
+			SELECT * FROM product WHERE REPLACE(title, ' ', '') LIKE CONCAT(’%’, #{title}, ‘%’)
+		]]>
+	</select>
+	<!--상품 검색(상품코드)-->
+	<select id="selectProductById" resultType="com.example.demoShop.dto.ProductDTO">
+		<![CDATA[
+			SELECT * FROM product WHERE id LIKE CONCAT(’%’, #{id}, ‘%’)
+		]]>
+	</select>
+	<!--상품 등록-->
 	<insert id="insertProduct">
 		<![CDATA[
 			INSERT INTO product (member_no, cate_no, title, info, price, img1, deli_price, stock, min_count, max_count, state, id, reg_date, upt_date, sort) 
 			VALUES (#{member_no}, #{cate_no}, #{title}, #{info}, #{price}, #{img1}, #{deli_price}, #{stock}, #{min_count}, #{max_count}, ‘Y’, #{id}, now(), now(), #{sort})
 		]]>
 	</insert>
+	<!--상품 수정-->
+	<update id="updateProduct">
+		<![CDATA[
+			UPDATE product 
+			SET title = #{tilte}, info = #{info}, price = #{price}, img1 = #{img1}, deli_price = #{deli_price}, stock = #{stock}, min_count = #{min_count}, max_count = #{max_count}, state = #{state}, id = #{id}, upt_date = now(), sort = #{sort} 
+			WHERE no = #{no}
+		]]>
+	</update>
+	<!--상품 삭제-->
+	<delete id="deleteProduct">
+		DELETE FROM product WHERE no = #{no}
+	</delete>
 </mapper>
