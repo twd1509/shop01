@@ -17,6 +17,9 @@ public class MemberService {
 	
 	//회원 가입
 	public int insertMember(MemberDTO mbrDto) {
+		if(!checkEmail(mbrDto.getEmail())) return -1;
+		if(!checkPhone(mbrDto.getPhone())) return -2;
+		
 		return mbrMapper.insertMember(mbrDto);
 	}
 	

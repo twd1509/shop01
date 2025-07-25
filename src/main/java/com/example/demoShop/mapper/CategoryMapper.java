@@ -14,10 +14,11 @@ public interface CategoryMapper {
 	int updateCategory(CategoryDTO cDto);
 	//카테고리 삭제
 	int deleteCategory(int no);
-	//전체 카테고리 검색
+	//전체 카테고리
 	List<CategoryDTO> selectAllCategory();
 	//카테고리 검색
-	List<CategoryDTO> selectCategoryByTitle(String title);
-	List<CategoryDTO> selectCategoryById(String id);
-	
+	List<CategoryDTO> selectCategoryByTitle(String title);		//카테고리명
+	List<CategoryDTO> selectCategoryById(String id);			//아이디
+	List<CategoryDTO> selectCategoryByNo(int no);				//no
+	List<CategoryDTO> selectCategory(String keyword);			//전체 검색
 }

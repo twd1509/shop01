@@ -12,6 +12,14 @@
 	<select id="selectAllCategory" resultType="com.example.demoShop.dto.CategoryDTO">
 		SELECT * FROM category
 	</select>
+	<!--카테고리 검색(전체)-->
+	<select id="selectCategory" resultType="com.example.demoShop.dto.CategoryDTO">
+		<![CDATA[
+			SELECT * FROM category 
+			WHERE REPLACE(title, ' ', '') CONCAT (’%’, #{keyword}, ‘%’) 
+			OR id CONCAT (’%’, #{keyword}, ‘%’)
+		]]>
+	</select>
 	<!--카테고리 검색(카테고리명)-->
 	<select id="selectCategoryByTitle" resultType="com.example.demoShop.dto.CategoryDTO">
 		<![CDATA[
@@ -22,6 +30,12 @@
 	<select id="selectCategoryById" resultType="com.example.demoShop.dto.CategoryDTO">
 		<![CDATA[
 			SELECT * FROM category WHERE id CONCAT (’%’, #{id}, ‘%’)
+		]]>
+	</select>
+	<!--카테고리 검색(No)-->
+	<select id="selectCategoryByNo" resultType="com.example.demoShop.dto.CategoryDTO">
+		<![CDATA[
+			SELECT * FROM category WHERE no = #{no}
 		]]>
 	</select>
 	<!--카테고리 수정-->

@@ -5,6 +5,20 @@
 	<select id="selectAllProduct" resultType="com.example.demoShop.dto.ProductDTO">
 		SELECT * FROM product
 	</select>
+	<!--상품 검색(전체)-->
+	<select id="selectProductByTitle" resultType="com.example.demoShop.dto.ProductDTO">
+		<![CDATA[
+			SELECT * FROM product 
+			WHERE REPLACE(title, ' ', '') LIKE CONCAT(’%’, #{keyword}, ‘%’)
+			OR id LIKE CONCAT(’%’, #{keyword}, ‘%’)
+		]]>
+	</select>
+	<!--상품 검색(no)-->
+	<select id="selectProductByNo" resultType="com.example.demoShop.dto.ProductDTO">
+		<![CDATA[
+			SELECT * FROM product WHERE no = #{no}
+		]]>
+	</select>
 	<!--상품 검색(상품명)-->
 	<select id="selectProductByTitle" resultType="com.example.demoShop.dto.ProductDTO">
 		<![CDATA[

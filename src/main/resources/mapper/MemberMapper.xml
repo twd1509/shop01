@@ -31,8 +31,8 @@
 	<select id="selectMember" resultType="com.example.demoShop.dto.MemberDTO">
 		<![CDATA[
 			SELECT * FROM member 
-			WHERE REPLACE(name, ‘ ‘ , ‘’) LIKE CONCAT(‘%’, #{name}, ‘%’) 
-			OR email LIKE CONCAT(‘%’, #{email}, ‘%’)
+			WHERE REPLACE(name, ‘ ‘ , ‘’) LIKE CONCAT(‘%’, #{keyword}, ‘%’) 
+			OR email LIKE CONCAT(‘%’, #{keyword}, ‘%’)
 		]]>
 	</select>
 	<!--이메일 중복 체크-->
