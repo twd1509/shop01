@@ -2,6 +2,7 @@ package com.example.demoShop.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demoShop.dto.MemberDTO;
@@ -10,9 +11,11 @@ import com.example.demoShop.mapper.MemberMapper;
 @Service
 public class MemberService {
 	private final MemberMapper mbrMapper;
+	private final BCryptPasswordEncoder passwordEncoder;
 	
-	public MemberService(MemberMapper mbrMapper) {
+	public MemberService(MemberMapper mbrMapper, BCryptPasswordEncoder passwordEncoder) {
 		this.mbrMapper = mbrMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 	
 	//회원 가입
@@ -20,6 +23,7 @@ public class MemberService {
 		if(!checkEmail(mbrDto.getEmail())) return -1;
 		if(!checkPhone(mbrDto.getPhone())) return -2;
 		
+		mbrDto.setPassword(passwordEncoder.encode(mbrDto.getPassword()));
 		return mbrMapper.insertMember(mbrDto);
 	}
 	
@@ -80,7 +84,12 @@ public class MemberService {
 	
 	//로그인
 	public MemberDTO loginMember(String email, String password) {
-		return mbrMapper.loginMember(email, password);
+		MemberDTO member = mbrMapper.loginMember(email, passwordEncoder.encode(password));
+//        if(member != null && passwordEncoder.matches(password, member.getPassword())) {
+//            return member;
+//        }
+		
+		return member;
 	}
 	
 	//아이디 찾기

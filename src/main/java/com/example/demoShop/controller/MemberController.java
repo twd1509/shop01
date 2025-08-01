@@ -13,18 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demoShop.JwtUtil;
+import com.example.demoShop.dto.LoginResponse;
 import com.example.demoShop.dto.MemberDTO;
 import com.example.demoShop.service.MemberService;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/members")
 public class MemberController {
 	private final MemberService memberService;
+	private final JwtUtil jwtUtil;
 	
-	public MemberController(MemberService memberService) {
-		this.memberService = memberService;
-	}
+	public MemberController(MemberService memberService, JwtUtil jwtUtil) {
+        this.memberService = memberService;
+        this.jwtUtil = jwtUtil;
+    }
 	
 	//회원 가입
     @PostMapping("/join")
@@ -82,9 +86,10 @@ public class MemberController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<?> loginMember(@RequestBody MemberDTO memberDTO) {
-        MemberDTO loggedInMember = memberService.loginMember(memberDTO.getEmail(), memberDTO.getPassword());
-        if(loggedInMember != null) {
-            return ResponseEntity.ok(loggedInMember);
+    	MemberDTO loggedInMember = memberService.loginMember(memberDTO.getEmail(), memberDTO.getPassword());
+        if (loggedInMember != null) {
+            String token = jwtUtil.generateToken(memberDTO.getEmail());
+            return ResponseEntity.ok().body(new LoginResponse(token, loggedInMember));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 또는 비밀번호가 잘못되었습니다.");
     }
