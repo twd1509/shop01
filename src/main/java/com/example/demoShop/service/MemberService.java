@@ -101,4 +101,9 @@ public class MemberService {
 	public MemberDTO findMemberByPw(String phone, String name, String email) {
 		return mbrMapper.findMemberByPw(phone, name, email);
 	}
+	
+	//이메일로 조회
+	public MemberDTO selectMemberByEmail(String email) {
+		return mbrMapper.selectMemberByEmail(email).get(0);
+	}
 }

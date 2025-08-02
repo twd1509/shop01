@@ -80,6 +80,11 @@
 	        <artifactId>jjwt</artifactId>
 	        <version>0.9.1</version>
 	    </dependency>
+	    <!--이메일 전송-->
+	    <dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
