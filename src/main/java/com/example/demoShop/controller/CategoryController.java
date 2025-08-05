@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demoShop.dto.CategoryDTO;
 import com.example.demoShop.service.CategoryService;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
@@ -23,7 +26,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    // 카테고리 생성
+    //카테고리 생성
     @PostMapping("/create")
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
         int result = categoryService.insertCategory(categoryDTO);
@@ -35,15 +38,15 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    // 전체 카테고리 조회
+    //전체 카테고리 조회
     @GetMapping("/list")
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         List<CategoryDTO> categories = categoryService.selectAllCategory();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    // 카테고리 검색
-    @PostMapping("/search")
+    //카테고리 검색
+    @GetMapping("/search")
     public ResponseEntity<List<CategoryDTO>> searchCategories(
             @RequestParam("searchType") String searchType,
             @RequestParam("keyword") String keyword) {
@@ -57,9 +60,9 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // 카테고리 삭제
-    @PostMapping("/delete")
-    public ResponseEntity<Void> deleteCategory(@RequestParam("no") int no) {
+    //카테고리 삭제
+    @PostMapping("/delete/{no}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable int no) {
         int result = categoryService.deleteCategory(no);
         
         if (result > 0) {
@@ -69,10 +72,10 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // 카테고리 수정
-    @PostMapping("/update")
+    //카테고리 수정
+    @PostMapping("/update/{no}")
     public ResponseEntity<CategoryDTO> updateCategory(
-            @RequestParam("no") int no,
+    		@PathVariable int no,
             @RequestBody CategoryDTO categoryDTO) {
     	
         categoryDTO.setNo(no); // DTO에 ID 설정

@@ -6,11 +6,11 @@
 		SELECT * FROM product
 	</select>
 	<!--상품 검색(전체)-->
-	<select id="selectProductByTitle" resultType="com.example.demoShop.dto.ProductDTO">
+	<select id="selectProduct" resultType="com.example.demoShop.dto.ProductDTO">
 		<![CDATA[
 			SELECT * FROM product 
-			WHERE REPLACE(title, ' ', '') LIKE CONCAT(’%’, #{keyword}, ‘%’)
-			OR id LIKE CONCAT(’%’, #{keyword}, ‘%’)
+			WHERE REPLACE(title, ' ', '') LIKE CONCAT('%', #{keyword}, '%')
+			OR id LIKE CONCAT('%', #{keyword}, '%')
 		]]>
 	</select>
 	<!--상품 검색(no)-->
@@ -22,27 +22,27 @@
 	<!--상품 검색(상품명)-->
 	<select id="selectProductByTitle" resultType="com.example.demoShop.dto.ProductDTO">
 		<![CDATA[
-			SELECT * FROM product WHERE REPLACE(title, ' ', '') LIKE CONCAT(’%’, #{title}, ‘%’)
+			SELECT * FROM product WHERE REPLACE(title, ' ', '') LIKE CONCAT('%', #{title}, '%')
 		]]>
 	</select>
 	<!--상품 검색(상품코드)-->
 	<select id="selectProductById" resultType="com.example.demoShop.dto.ProductDTO">
 		<![CDATA[
-			SELECT * FROM product WHERE id LIKE CONCAT(’%’, #{id}, ‘%’)
+			SELECT * FROM product WHERE id LIKE CONCAT('%', #{id}, '%')
 		]]>
 	</select>
 	<!--상품 등록-->
 	<insert id="insertProduct">
 		<![CDATA[
 			INSERT INTO product (member_no, cate_no, title, info, price, img1, deli_price, stock, min_count, max_count, state, id, reg_date, upt_date, sort) 
-			VALUES (#{member_no}, #{cate_no}, #{title}, #{info}, #{price}, #{img1}, #{deli_price}, #{stock}, #{min_count}, #{max_count}, ‘Y’, #{id}, now(), now(), #{sort})
+			VALUES (#{member_no}, #{cateNo}, #{title}, #{info}, #{price}, #{img1}, #{deliPrice}, #{stock}, #{minCount}, #{maxCount}, 'Y', #{id}, now(), now(), #{sort})
 		]]>
 	</insert>
 	<!--상품 수정-->
 	<update id="updateProduct">
 		<![CDATA[
 			UPDATE product 
-			SET title = #{tilte}, info = #{info}, price = #{price}, img1 = #{img1}, deli_price = #{deli_price}, stock = #{stock}, min_count = #{min_count}, max_count = #{max_count}, state = #{state}, id = #{id}, upt_date = now(), sort = #{sort} 
+			SET title = #{tilte}, info = #{info}, price = #{price}, img1 = #{img1}, deli_price = #{deliPrice}, stock = #{stock}, min_count = #{minCount}, max_count = #{maxCount}, state = #{state}, id = #{id}, upt_date = now(), sort = #{sort} 
 			WHERE no = #{no}
 		]]>
 	</update>

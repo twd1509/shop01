@@ -27,7 +27,7 @@ public interface MemberMapper {
 	int checkEmail(String email);		//이메일
 	int checkPhone(String phone);		//휴대폰
 	//로그인
-	MemberDTO loginMember(String email, String password);
+	MemberDTO loginMember(String email);
 	//이메일 찾기
 	MemberDTO findMemberByEmail(String phone, String name);
 	//비밀번호 찾기

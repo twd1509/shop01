@@ -30,7 +30,7 @@ public class ProductService {
 	}
 	
 	//상품 삭제
-	public int delteProduct(int no) {
+	public int deleteProduct(int no) {
 		return pMapper.deleteProduct(no);
 	}
 	

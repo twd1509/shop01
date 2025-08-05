@@ -20,8 +20,8 @@ public class MemberService {
 	
 	//회원 가입
 	public int insertMember(MemberDTO mbrDto) {
-		if(!checkEmail(mbrDto.getEmail())) return -1;
-		if(!checkPhone(mbrDto.getPhone())) return -2;
+		if(checkEmail(mbrDto.getEmail())) return -1;
+		if(checkPhone(mbrDto.getPhone())) return -2;
 		
 		mbrDto.setPassword(passwordEncoder.encode(mbrDto.getPassword()));
 		return mbrMapper.insertMember(mbrDto);
@@ -74,6 +74,8 @@ public class MemberService {
 	
 	//회원 수정
 	public int updateMember(MemberDTO mbrDto) {
+		mbrDto.setPassword(passwordEncoder.encode(mbrDto.getPassword()));
+		
 		return mbrMapper.updateMember(mbrDto);
 	}
 	
@@ -84,12 +86,13 @@ public class MemberService {
 	
 	//로그인
 	public MemberDTO loginMember(String email, String password) {
-		MemberDTO member = mbrMapper.loginMember(email, passwordEncoder.encode(password));
-//        if(member != null && passwordEncoder.matches(password, member.getPassword())) {
-//            return member;
-//        }
+		MemberDTO member = mbrMapper.loginMember(email);
 		
-		return member;
+		if (member != null && passwordEncoder.matches(password, member.getPassword())) {
+            return member;
+        }
+		
+        return null;
 	}
 	
 	//아이디 찾기
