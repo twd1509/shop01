@@ -3,6 +3,7 @@ package com.example.demoShop;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,6 +13,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -32,7 +34,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // REST API이므로 CSRF 비활성화
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 사용, 세션 비활성화
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/members/**").permitAll() // 인증 없이 접근 허용
+                .requestMatchers("/api/members/**").permitAll() 		//인증 없이 접근 허용
+                .requestMatchers("/api/products/list").permitAll()
+                .requestMatchers("/api/products/**").authenticated()	//인증 필요
+                .requestMatchers("/api/categories/**").authenticated()
+                .requestMatchers("/api/orders/**").authenticated()
                 .anyRequest().authenticated() // 나머지 요청은 인증 필요
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
@@ -43,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // 허용 도메인
+        configuration.addAllowedOrigin("http://localhost:3000"); // 허용 도메인
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키/인증 정보 허용

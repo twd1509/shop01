@@ -42,13 +42,17 @@ public class MemberController {
 	//회원 가입
     @PostMapping("/join")
     public ResponseEntity<?> registerMember(@RequestBody MemberDTO memberDTO) {
-        int result = memberService.insertMember(memberDTO);
-        if(result == -1) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용 중인 이메일입니다.");
-        } else if(result == -2) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용 중인 휴대폰 번호입니다.");
+    	try {
+	        int result = memberService.insertMember(memberDTO);
+	        
+	        if(result > 0) {
+	        	return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
+	        }
+	        
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원 가입 실패");
+    	} catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
     }
 
     //이메일 중복 확인
@@ -58,7 +62,7 @@ public class MemberController {
     }
 
     //전체 회원 조회
-    @GetMapping("/all")
+    @GetMapping("/list")
     public ResponseEntity<List<MemberDTO>> getAllMembers() {
         return ResponseEntity.ok(memberService.selectAllMember());
     }
@@ -86,9 +90,11 @@ public class MemberController {
     @PostMapping("/delete/{no}")
     public ResponseEntity<?> deleteMember(@PathVariable int no) {
         int result = memberService.deleteMember(no);
+        
         if(result > 0) {
             return ResponseEntity.ok("회원 탈퇴 성공");
         }
+        
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
     }
 
@@ -135,21 +141,25 @@ public class MemberController {
     //비밀번호 재설정
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    	//로그인 확인
         if(!jwtUtil.validateToken(request.getToken()) || !jwtUtil.isPasswordResetToken(request.getToken())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 토큰입니다.");
         }
 
         String email = jwtUtil.getEmailFromToken(request.getToken());
         MemberDTO member = memberService.selectMemberByEmail(email);
+        
         if(member == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 이메일로 회원을 찾을 수 없습니다.");
         }
 
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
         int result = memberService.updateMember(member);
+        
         if(result > 0) {
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
         }
+        
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 변경에 실패했습니다.");
     }
 }

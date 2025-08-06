@@ -28,21 +28,20 @@ public class CategoryController {
 
     //카테고리 생성
     @PostMapping("/create")
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO) {
         int result = categoryService.insertCategory(categoryDTO);
         
-        if (result > 0) {
-            return new ResponseEntity<>(categoryDTO, HttpStatus.CREATED);
+        if(result > 0) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("카테고리 등록 성공");
         }
         
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카테고리 등록 실패");
     }
 
     //전체 카테고리 조회
     @GetMapping("/list")
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
-        List<CategoryDTO> categories = categoryService.selectAllCategory();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+    	return ResponseEntity.ok(categoryService.selectAllCategory());
     }
 
     //카테고리 검색
@@ -51,40 +50,33 @@ public class CategoryController {
             @RequestParam("searchType") String searchType,
             @RequestParam("keyword") String keyword) {
     	
-        List<CategoryDTO> categories = categoryService.selectCategory(searchType, keyword);
-        
-        if (categories != null && !categories.isEmpty()) {
-            return new ResponseEntity<>(categories, HttpStatus.OK);
-        }
-        
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    	return ResponseEntity.ok(categoryService.selectCategory(searchType, keyword));
     }
 
     //카테고리 삭제
     @PostMapping("/delete/{no}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable int no) {
+    public ResponseEntity<?> deleteCategory(@PathVariable int no) {
         int result = categoryService.deleteCategory(no);
         
-        if (result > 0) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        if(result > 0) {
+            return ResponseEntity.ok("카테고리 삭제 성공");
         }
         
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("카테고리 정보를 찾을 수 없습니다.");
     }
 
     //카테고리 수정
-    @PostMapping("/update/{no}")
-    public ResponseEntity<CategoryDTO> updateCategory(
+    @PostMapping("/modify/{no}")
+    public ResponseEntity<?> updateCategory(
     		@PathVariable int no,
             @RequestBody CategoryDTO categoryDTO) {
     	
         categoryDTO.setNo(no); // DTO에 ID 설정
         int result = categoryService.updateCategory(categoryDTO);
         
-        if (result > 0) {
-            return new ResponseEntity<>(categoryDTO, HttpStatus.OK);
+        if(result > 0) {
+            return ResponseEntity.ok("카테고리 수정 성공");
         }
-        
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("카테고리 정보를 찾을 수 없습니다.");
     }
 }

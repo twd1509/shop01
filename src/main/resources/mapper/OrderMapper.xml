@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demoShop.mapper.OrderMapper">
+
+    <!-- OrderDTO ResultMap -->
+    <resultMap id="OrderResultMap" type="com.example.demoShop.dto.OrderDTO">
+        <id property="no" column="no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="productNo" column="product_no"/>
+        <result property="title" column="title"/>
+        <result property="count" column="count"/>
+        <result property="productPrice" column="product_price"/>
+        <result property="deliPrice" column="deli_price"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="orderId" column="order_id"/>
+        <result property="tid" column="tid"/>
+        <result property="payType" column="pay_type"/>
+        <result property="payPrice" column="pay_price"/>
+        <result property="email" column="email"/>
+        <result property="address1" column="address1"/>
+        <result property="address2" column="address2"/>
+        <result property="postNum" column="post_num"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="memo" column="memo"/>
+        <result property="deliCompany" column="deli_company"/>
+        <result property="deliCode" column="deli_code"/>
+        <result property="state" column="state"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="cancelReason" column="cancel_reason"/>
+        <result property="returnReason" column="return_reason"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="paymentDate" column="payment_date"/>
+        <result property="deliDate" column="deli_date"/>
+    </resultMap>
+
+    <!-- 주문 생성 -->
+    <insert id="insertOrder" parameterType="com.example.demoShop.dto.OrderDTO" useGeneratedKeys="true" keyProperty="no">
+        INSERT INTO order (
+            member_no, product_no, title, count, product_price, deli_price, total_price,
+            order_id, tid, pay_type, pay_price, email, address1, address2, post_num,
+            name, phone, memo, deli_company, deli_code, state, reg_date,
+            cancel_reason, return_reason, payment_date, deli_date
+        )
+        VALUES (
+            #{memberNo}, #{productNo}, #{title}, #{count}, #{productPrice}, #{deliPrice}, #{totalPrice},
+            #{orderId}, #{tid}, #{payType}, #{payPrice}, #{email}, #{address1}, #{address2}, #{postNum},
+            #{name}, #{phone}, #{memo}, #{deliCompany}, #{deliCode}, #{state}, NOW(),
+            '', '', #{paymentDate}, ''
+        )
+    </insert>
+
+    <!-- 주문번호로 주문 조회 -->
+    <select id="selectOrderByNo" parameterType="int" resultMap="OrderResultMap">
+        SELECT * FROM order WHERE no = #{no}
+    </select>
+
+    <!-- 주문 ID로 주문 조회 -->
+    <select id="selectOrderByOrderId" parameterType="string" resultMap="OrderResultMap">
+        SELECT * FROM order WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 회원번호로 주문 목록 조회 -->
+    <select id="selectOrdersByMemberNo" parameterType="int" resultMap="OrderResultMap">
+        SELECT * FROM order WHERE member_no = #{memberNo} ORDER BY reg_date DESC
+    </select>
+
+    <!-- 전체 주문 목록 조회 -->
+    <select id="selectAllOrders" resultMap="OrderResultMap">
+        SELECT * FROM order ORDER BY reg_date DESC
+    </select>
+
+    <!-- 주문 상태로 주문 목록 조회 -->
+    <select id="selectOrdersByState" parameterType="string" resultMap="OrderResultMap">
+        SELECT * FROM order WHERE state = #{state} ORDER BY reg_date DESC
+    </select>
+
+    <!-- 주문 검색 (주문 ID, 이메일, 수령인 이름) -->
+    <select id="searchOrders" parameterType="map" resultMap="OrderResultMap">
+        SELECT * FROM order
+        WHERE
+        	<if test="searchType == ''">
+                name LIKE CONCAT('%', #{keyword}, '%')
+                OR order_id LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'orderId'">
+                order_id LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'email'">
+                email LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'name'">
+                name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        ORDER BY reg_date DESC
+    </select>
+
+    <!-- 주문 상태 수정 -->
+    <update id="updateOrderState" parameterType="map">
+        UPDATE order
+        SET
+            state = #{state},
+            update_date = NOW()
+            <if test="cancelReason != null">
+                , cancel_reason = #{cancelReason}
+            </if>
+            <if test="returnReason != null">
+                , return_reason = #{returnReason}
+            </if>
+        WHERE no = #{no}
+    </update>
+
+    <!-- 주문 배송 정보 수정 -->
+    <update id="updateOrderDelivery" parameterType="com.example.demoShop.dto.OrderDTO">
+        UPDATE order
+        SET
+            deli_company = #{deliCompany},
+            deli_code = #{deliCode},
+            deli_date = #{deliDate},
+            update_date = NOW()
+        WHERE no = #{no}
+    </update>
+
+    <!-- 주문 삭제 -->
+    <delete id="deleteOrder" parameterType="int">
+        DELETE FROM `order` WHERE no = #{no}
+    </delete>
+
+</mapper>

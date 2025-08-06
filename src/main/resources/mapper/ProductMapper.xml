@@ -35,14 +35,14 @@
 	<insert id="insertProduct">
 		<![CDATA[
 			INSERT INTO product (member_no, cate_no, title, info, price, img1, deli_price, stock, min_count, max_count, state, id, reg_date, upt_date, sort) 
-			VALUES (#{member_no}, #{cateNo}, #{title}, #{info}, #{price}, #{img1}, #{deliPrice}, #{stock}, #{minCount}, #{maxCount}, 'Y', #{id}, now(), now(), #{sort})
+			VALUES (#{memberNo}, #{cateNo}, #{title}, #{info}, #{price}, #{img1}, #{deliPrice}, #{stock}, #{minCount}, #{maxCount}, 'Y', #{id}, now(), now(), #{sort})
 		]]>
 	</insert>
 	<!--상품 수정-->
 	<update id="updateProduct">
 		<![CDATA[
 			UPDATE product 
-			SET title = #{tilte}, info = #{info}, price = #{price}, img1 = #{img1}, deli_price = #{deliPrice}, stock = #{stock}, min_count = #{minCount}, max_count = #{maxCount}, state = #{state}, id = #{id}, upt_date = now(), sort = #{sort} 
+			SET cate_no = #{cateNo}, title = #{title}, info = #{info}, price = #{price}, img1 = #{img1}, deli_price = #{deliPrice}, stock = #{stock}, min_count = #{minCount}, max_count = #{maxCount}, state = #{state}, id = #{id}, upt_date = now(), sort = #{sort} 
 			WHERE no = #{no}
 		]]>
 	</update>

@@ -27,23 +27,27 @@ public class ProductController {
     }
 
     //상품 등록
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO) {
         int result = productService.insertProduct(productDTO);
-        if (result == -1) {
+        
+        if(result == -1) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("상품 아이디가 이미 존재합니다.");
         }
+        
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록 되었습니다.");
     }
 
     //상품 수정
-    @PostMapping("/modify/{id}")
-    public ResponseEntity<String> updateProduct(@PathVariable String id, @RequestBody ProductDTO productDTO) {
-        productDTO.setId(id);
+    @PostMapping("/modify/{no}")
+    public ResponseEntity<String> updateProduct(@PathVariable int no, @RequestBody ProductDTO productDTO) {
+        productDTO.setNo(no);
         int result = productService.updateProduct(productDTO);
-        if (result == -1) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
+        
+        if(result == -1) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 상품을 찾을 수 없습니다.");
         }
+        
         return ResponseEntity.ok("상품이 수정 되었습니다.");
     }
 
@@ -51,16 +55,19 @@ public class ProductController {
     @PostMapping("/delete/{no}")
     public ResponseEntity<String> deleteProduct(@PathVariable int no) {
         int result = productService.deleteProduct(no);
-        if (result == 0) {
+        
+        if(result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
         }
+        
         return ResponseEntity.ok("상품이 삭제 되었습니다.");
     }
 
     //전체 상품 출력
-    @GetMapping("/all")
+    @GetMapping("/list")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<ProductDTO> products = productService.selectAllProduct();
+        
         return ResponseEntity.ok(products);
     }
 
@@ -70,7 +77,8 @@ public class ProductController {
             @RequestParam String searchType,
             @RequestParam String keyword) {
         List<ProductDTO> products = productService.selectProduct(searchType, keyword);
-        if (products == null || products.isEmpty()) {
+        
+        if(products == null || products.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(products);

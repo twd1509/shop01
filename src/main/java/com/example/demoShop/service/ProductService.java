@@ -17,14 +17,14 @@ public class ProductService {
 	
 	//상품 등록
 	public int insertProduct(ProductDTO pDto) {
-		if(selectProduct("id", pDto.getId()) != null) return -1;
+		if(selectProduct("id", pDto.getId()).size() > 0) return -1;
 		
 		return pMapper.insertProduct(pDto);
 	}
 	
 	//상품 수정
 	public int updateProduct(ProductDTO pDto) {
-		if(selectProduct("id", pDto.getId()) != null) return -1;
+		if(selectProduct("no", Integer.toString(pDto.getNo())).size() <= 0) return -1;
 		
 		return pMapper.updateProduct(pDto);
 	}

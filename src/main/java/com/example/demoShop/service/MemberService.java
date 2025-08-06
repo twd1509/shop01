@@ -20,8 +20,28 @@ public class MemberService {
 	
 	//회원 가입
 	public int insertMember(MemberDTO mbrDto) {
-		if(checkEmail(mbrDto.getEmail())) return -1;
-		if(checkPhone(mbrDto.getPhone())) return -2;
+		if (mbrDto.getEmail() == null || mbrDto.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("이메일은 필수 입력입니다.");
+        }
+		if (mbrDto.getPassword() == null || mbrDto.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("비밀번호를 입력해 주세요.");
+        }
+		if (mbrDto.getName() == null || mbrDto.getName().isEmpty()) {
+            throw new IllegalArgumentException("이름을 입력해 주세요.");
+        }
+		if (mbrDto.getPhone() == null || mbrDto.getPhone().isEmpty()) {
+            throw new IllegalArgumentException("휴대폰 번호은 필수 입력입니다.");
+        }
+		if (mbrDto.getAddress1() == null || mbrDto.getAddress1().isEmpty()) {
+            throw new IllegalArgumentException("주소를 입력해 주세요.");
+        }
+		
+		if(checkEmail(mbrDto.getEmail())) {
+			throw new IllegalArgumentException("이미 등록된 이메일 입니다.");
+		}
+		if(checkPhone(mbrDto.getPhone())) {
+			throw new IllegalArgumentException("이미 등록된 휴대폰 번호 입니다.");
+		}
 		
 		mbrDto.setPassword(passwordEncoder.encode(mbrDto.getPassword()));
 		return mbrMapper.insertMember(mbrDto);

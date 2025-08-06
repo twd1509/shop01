@@ -5,7 +5,7 @@
 	<insert id="insertCategory">
 		<![CDATA[
 			INSERT INTO category (member_no, id, group_no, ref_no, depth, title, state, reg_date, upt_date) 
-			VALUES (#{member_no}, #{id}, #{groupNo}, #{refNo}, #{depth}, #{title}, 'Y', now(), now())
+			VALUES (#{memberNo}, #{id}, #{groupNo}, #{refNo}, #{depth}, #{title}, 'Y', now(), now())
 		]]>
 	</insert>
 	<!--전체 카테고리 조회-->
@@ -16,20 +16,20 @@
 	<select id="selectCategory" resultType="com.example.demoShop.dto.CategoryDTO">
 		<![CDATA[
 			SELECT * FROM category 
-			WHERE REPLACE(title, ' ', '') CONCAT ('%', #{keyword}, '%') 
-			OR id CONCAT ('%', #{keyword}, '%')
+			WHERE REPLACE(title, ' ', '') LIKE CONCAT ('%', #{keyword}, '%') 
+			OR id LIKE CONCAT ('%', #{keyword}, '%')
 		]]>
 	</select>
 	<!--카테고리 검색(카테고리명)-->
 	<select id="selectCategoryByTitle" resultType="com.example.demoShop.dto.CategoryDTO">
 		<![CDATA[
-			SELECT * FROM category WHERE REPLACE(title, ' ', '') CONCAT ('%', #{title}, '%')
+			SELECT * FROM category WHERE REPLACE(title, ' ', '') LIKE CONCAT ('%', #{title}, '%')
 		]]>
 	</select>
 	<!--카테고리 검색(ID)-->
 	<select id="selectCategoryById" resultType="com.example.demoShop.dto.CategoryDTO">
 		<![CDATA[
-			SELECT * FROM category WHERE id CONCAT ('%', #{id}, '%')
+			SELECT * FROM category WHERE id LIKE CONCAT ('%', #{id}, '%')
 		]]>
 	</select>
 	<!--카테고리 검색(No)-->
