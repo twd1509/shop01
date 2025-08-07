@@ -5,7 +5,7 @@ public class MemberDTO {
 	private String name;
 	private String password;
 	private String email;		//이메일 & 아이디
-	private int postNum;
+	private String postNum;
 	private String address1;
 	private String address2;
 	private String phone;
@@ -38,10 +38,10 @@ public class MemberDTO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public int getPostNum() {
+	public String getPostNum() {
 		return postNum;
 	}
-	public void setPostNum(int postNum) {
+	public void setPostNum(String postNum) {
 		this.postNum = postNum;
 	}
 	public String getAddress1() {

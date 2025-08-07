@@ -42,7 +42,7 @@ public class OrderController {
     }
 
     //주문 번호로 주문 조회
-    @GetMapping("/{no}")
+    @GetMapping("/list/{no}")
     public ResponseEntity<?> getOrderByNo(@PathVariable int no) {
         try {
             OrderDTO order = orderService.selectOrderByNo(no);

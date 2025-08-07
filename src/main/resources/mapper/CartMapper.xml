@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demoShop.mapper.CartMapper">
+    <!-- CartDTO ResultMap -->
+    <resultMap id="CartResultMap" type="com.example.demoShop.dto.CartDTO">
+        <id property="no" column="no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="productNo" column="product_no"/>
+        <result property="count" column="count"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="productTitle" column="product_title"/>
+    	<result property="productPrice" column="product_price"/>
+    	<result property="productImg1" column="product_img1"/>
+    </resultMap>
+
+    <!-- 장바구니 항목 추가 -->
+    <insert id="insertCart" parameterType="com.example.demoShop.dto.CartDTO" useGeneratedKeys="true" keyProperty="no">
+        INSERT INTO cart (member_no, product_no, count, reg_date)
+        VALUES (#{memberNo}, #{productNo}, #{count}, NOW())
+    </insert>
+
+    <!-- 장바구니 항목 번호로 조회 -->
+    <select id="selectCartByNo" parameterType="int" resultMap="CartResultMap">
+        SELECT c.no, c.member_no, c.product_no, c.count, c.reg_date,
+	           p.title AS product_title, p.price AS product_price, p.img1 AS product_img1
+	    FROM cart c
+	    LEFT JOIN product p ON c.product_no = p.no
+	    WHERE c.no = #{no} ORDER BY reg_date DESC
+    </select>
+
+    <!-- 회원별 장바구니 목록 조회 -->
+    <select id="selectCartsByMemberNo" parameterType="int" resultMap="CartResultMap">
+    	SELECT c.no, c.member_no, c.product_no, c.count, c.reg_date,
+	           p.title AS product_title, p.price AS product_price, p.img1 AS product_img1
+	    FROM cart c
+	    LEFT JOIN product p ON c.product_no = p.no
+	    WHERE c.member_no = #{memberNo} ORDER BY reg_date DESC
+    </select>
+
+    <!-- 특정 회원의 특정 상품 장바구니 항목 조회 -->
+    <select id="selectCartByMemberAndProduct" parameterType="map" resultMap="CartResultMap">
+    	SELECT c.no, c.member_no, c.product_no, c.count, c.reg_date,
+	           p.title AS product_title, p.price AS product_price, p.img1 AS product_img1
+	    FROM cart c
+	    LEFT JOIN product p ON c.product_no = p.no
+	    WHERE c.member_no = #{memberNo} AND c.product_no = #{productNo} ORDER BY reg_date DESC
+    </select>
+
+    <!-- 장바구니 항목 수량 수정 -->
+    <update id="updateCartCount" parameterType="com.example.demoShop.dto.CartDTO">
+        UPDATE cart SET count = #{count}
+        WHERE no = #{no}
+    </update>
+
+    <!-- 장바구니 항목 삭제(no) -->
+    <delete id="deleteCartByNo" parameterType="int">
+        DELETE FROM cart WHERE no = #{no}
+    </delete>
+    
+    <!-- 장바구니 항목 삭제(product_no) -->
+    <delete id="deleteCartByProductNo" parameterType="int">
+        DELETE FROM cart WHERE product_no = #{productNo}
+    </delete>
+
+    <!-- 회원의 모든 장바구니 항목 삭제 -->
+    <delete id="deleteCartsByMemberNo" parameterType="int">
+        DELETE FROM cart WHERE member_no = #{memberNo}
+    </delete>
+</mapper>

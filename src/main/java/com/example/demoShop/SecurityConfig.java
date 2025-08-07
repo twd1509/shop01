@@ -13,7 +13,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity		//웹 보안을 활성화하는 역할, 스프링 시큐리티의 필터 체인을 자동으로 등록
 public class SecurityConfig {
 
     @Bean
@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/products/**").authenticated()	//인증 필요
                 .requestMatchers("/api/categories/**").authenticated()
                 .requestMatchers("/api/orders/**").authenticated()
+                .requestMatchers("/api/carts/**").authenticated()
                 .anyRequest().authenticated() // 나머지 요청은 인증 필요
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
