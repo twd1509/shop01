@@ -58,8 +58,13 @@
     </delete>
     
     <!-- 장바구니 항목 삭제(product_no) -->
-    <delete id="deleteCartByProductNo" parameterType="int">
+    <!--<delete id="deleteCartByProductNo" parameterType="int">
         DELETE FROM cart WHERE product_no = #{productNo}
+    </delete>-->
+    
+    <!-- 장바구니 항목 삭제(member_no, product_no) -->
+    <delete id="deleteCartByMemberAndProduct" parameterType="map">
+        DELETE FROM cart WHERE member_no = #{memberNo} AND product_no = #{productNo}
     </delete>
 
     <!-- 회원의 모든 장바구니 항목 삭제 -->

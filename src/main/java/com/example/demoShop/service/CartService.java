@@ -51,10 +51,20 @@ public class CartService {
         if (no <= 0) {
             throw new IllegalArgumentException("장바구니 번호는 1 이상이어야 합니다.");
         }
+        
         CartDTO cart = cartMapper.selectCartByNo(no);
+        
         if (cart == null) {
             throw new IllegalArgumentException("장바구니 번호 " + no + "에 해당하는 항목이 없습니다.");
         }
+        
+        // null 처리
+        if (cart.getProductTitle() == null) {
+            cart.setProductTitle("삭제된 상품");
+            cart.setProductPrice(0);
+            cart.setProductImg1("https://example.com/deleted.jpg");
+        }
+        
         return cart;
     }
 
@@ -63,7 +73,18 @@ public class CartService {
         if (memberNo <= 0) {
             throw new IllegalArgumentException("회원 번호는 1 이상이어야 합니다.");
         }
-        return cartMapper.selectCartsByMemberNo(memberNo);
+        
+        List<CartDTO> carts = cartMapper.selectCartsByMemberNo(memberNo);
+        // null 처리
+        for (CartDTO cart : carts) {
+            if (cart.getProductTitle() == null) {
+                cart.setProductTitle("삭제된 상품");
+                cart.setProductPrice(0);
+                cart.setProductImg1("https://example.com/deleted.jpg");
+            }
+        }
+        
+        return carts;
     }
 
     //특정 회원의 특정 상품 장바구니 항목 조회
@@ -74,7 +95,16 @@ public class CartService {
         Map<String, Integer> params = new HashMap<>();
         params.put("memberNo", memberNo);
         params.put("productNo", productNo);
-        return cartMapper.selectCartByMemberAndProduct(params);
+
+        CartDTO cart = cartMapper.selectCartByMemberAndProduct(params);
+
+        if (cart != null && cart.getProductTitle() == null) {
+            cart.setProductTitle("삭제된 상품");
+            cart.setProductPrice(0);
+            cart.setProductImg1("https://example.com/deleted.jpg");
+        }
+
+        return cart;
     }
 
     //장바구니 항목 수량 수정
@@ -98,6 +128,7 @@ public class CartService {
         return cartMapper.deleteCartByNo(no);
     }
 
+    /*
     //장바구니 항목 삭제(product_no)
     @Transactional
     public int deleteCartByProductNo(int productNo) {
@@ -105,6 +136,19 @@ public class CartService {
             throw new IllegalArgumentException("상품 번호는 1 이상이어야 합니다.");
         }
         return cartMapper.deleteCartByProductNo(productNo);
+    }
+    */
+    
+    //장바구니 항목 삭제(member_no, product_no)
+    @Transactional
+    public int deleteCartByMemberAndProduct(int memberNo, int productNo) {
+        if (memberNo <= 0 || productNo <= 0) {
+            throw new IllegalArgumentException("회원번호와 상품번호는 필수입니다.");
+        }
+        Map<String, Integer> params = new HashMap<>();
+        params.put("memberNo", memberNo);
+        params.put("productNo", productNo);
+        return cartMapper.deleteCartByMemberAndProduct(params);
     }
 
     //회원의 모든 장바구니 항목 삭제

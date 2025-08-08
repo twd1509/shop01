@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demoShop.mapper.CategoryMapper">
+	<resultMap id="CategoryResultMap" type="com.example.demoShop.dto.CategoryDTO">
+        <id property="no" column="no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="id" column="id"/>
+        <result property="groupNo" column="group_no"/>
+        <result property="refNo" column="ref_no"/>
+        <result property="depth" column="depth"/>
+        <result property="title" column="title"/>
+        <result property="state" column="state"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="uptDate" column="upt_date"/>
+    </resultMap>
+    
 	<!--카테고리 등록-->
-	<insert id="insertCategory">
+	<insert id="insertCategory" parameterType="com.example.demoShop.dto.CategoryDTO" useGeneratedKeys="true" keyProperty="no">
 		<![CDATA[
 			INSERT INTO category (member_no, id, group_no, ref_no, depth, title, state, reg_date, upt_date) 
 			VALUES (#{memberNo}, #{id}, #{groupNo}, #{refNo}, #{depth}, #{title}, 'Y', now(), now())
 		]]>
 	</insert>
 	<!--전체 카테고리 조회-->
-	<select id="selectAllCategory" resultType="com.example.demoShop.dto.CategoryDTO">
+	<select id="selectAllCategory" resultMap="CategoryResultMap">
 		SELECT * FROM category
 	</select>
 	<!--카테고리 검색(전체)-->
-	<select id="selectCategory" resultType="com.example.demoShop.dto.CategoryDTO">
+	<select id="selectCategory" resultMap="CategoryResultMap">
 		<![CDATA[
 			SELECT * FROM category 
 			WHERE REPLACE(title, ' ', '') LIKE CONCAT ('%', #{keyword}, '%') 
@@ -21,19 +34,19 @@
 		]]>
 	</select>
 	<!--카테고리 검색(카테고리명)-->
-	<select id="selectCategoryByTitle" resultType="com.example.demoShop.dto.CategoryDTO">
+	<select id="selectCategoryByTitle" resultMap="CategoryResultMap">
 		<![CDATA[
 			SELECT * FROM category WHERE REPLACE(title, ' ', '') LIKE CONCAT ('%', #{title}, '%')
 		]]>
 	</select>
 	<!--카테고리 검색(ID)-->
-	<select id="selectCategoryById" resultType="com.example.demoShop.dto.CategoryDTO">
+	<select id="selectCategoryById" resultMap="CategoryResultMap">
 		<![CDATA[
 			SELECT * FROM category WHERE id LIKE CONCAT ('%', #{id}, '%')
 		]]>
 	</select>
 	<!--카테고리 검색(No)-->
-	<select id="selectCategoryByNo" resultType="com.example.demoShop.dto.CategoryDTO">
+	<select id="selectCategoryByNo" resultMap="CategoryResultMap">
 		<![CDATA[
 			SELECT * FROM category WHERE no = #{no}
 		]]>

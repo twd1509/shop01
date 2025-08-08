@@ -40,16 +40,32 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
-    //주문 번호로 주문 조회
-    @GetMapping("/list/{no}")
-    public ResponseEntity<?> getOrderByNo(@PathVariable int no) {
+    
+    //장바구니에서 주문
+    @PostMapping("/create-from-cart/{memberNo}")
+    public ResponseEntity<?> createOrderFromCart(@PathVariable int memberNo, @RequestBody OrderDTO orderDTO) {
         try {
-            OrderDTO order = orderService.selectOrderByNo(no);
+            List<OrderDTO> orders = orderService.insertOrderFromCart(memberNo, orderDTO);
             
-            return ResponseEntity.ok(order);
+            return ResponseEntity.status(HttpStatus.CREATED).body(orders);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    //주문 취소
+    @PostMapping("/cancel/{orderNo}")
+    public ResponseEntity<?> cancelOrder(@PathVariable int orderNo) {
+        try {
+            int result = orderService.cancelOrder(orderNo);
+            
+            if (result > 0) {
+                return ResponseEntity.ok("주문이 취소되었습니다.");
+            }
+            
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("주문 취소에 실패했습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

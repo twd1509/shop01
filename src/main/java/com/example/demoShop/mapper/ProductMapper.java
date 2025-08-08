@@ -14,6 +14,8 @@ public interface ProductMapper {
 	int updateProduct(ProductDTO pDto);
 	//상품 삭제
 	int deleteProduct(int no);
+	//재고 수정
+	int updateProductStock(ProductDTO productDTO);
 	//전체 상품
 	List<ProductDTO> selectAllProduct();
 	//상품 검색

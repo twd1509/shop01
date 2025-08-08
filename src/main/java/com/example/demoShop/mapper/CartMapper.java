@@ -15,6 +15,7 @@ public interface CartMapper {
     CartDTO selectCartByMemberAndProduct(Map<String, Integer> params);
     int updateCartCount(CartDTO cartDTO);
     int deleteCartByNo(int no);
-    int deleteCartByProductNo(int productNo);
+    //int deleteCartByProductNo(int productNo);
+    int deleteCartByMemberAndProduct(Map<String, Integer> params);
     int deleteCartsByMemberNo(int memberNo);
 }
