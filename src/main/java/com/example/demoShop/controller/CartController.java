@@ -113,6 +113,7 @@ public class CartController {
     }
 
     // 장바구니 항목 삭제 (productNo)
+    /*
     @PostMapping("/delete/product/{productNo}")
     public ResponseEntity<?> deleteCartByProductNo(@PathVariable int productNo) {
         try {
@@ -127,6 +128,7 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+    */
 
     // 회원의 모든 장바구니 항목 삭제
     @PostMapping("/delete/member/{memberNo}")

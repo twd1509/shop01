@@ -11,7 +11,7 @@ import com.example.demoShop.dto.OrderDTO;
 public interface OrderMapper {
     int insertOrder(OrderDTO orderDTO);
     OrderDTO selectOrderByNo(int no);
-    OrderDTO selectOrderByOrderId(String orderId);
+    List<OrderDTO> selectOrdersByOrderId(String orderId);
     List<OrderDTO> selectOrdersByMemberNo(int memberNo);
     List<OrderDTO> selectAllOrders();
     List<OrderDTO> selectOrdersByState(String state);

@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demoShop.dto.CartDTO;
 import com.example.demoShop.dto.CategoryDTO;
+import com.example.demoShop.dto.OrderCancelDTO;
 import com.example.demoShop.dto.OrderDTO;
 import com.example.demoShop.dto.ProductDTO;
 import com.example.demoShop.mapper.CategoryMapper;
+import com.example.demoShop.mapper.OrderCancelMapper;
 import com.example.demoShop.mapper.OrderMapper;
 import com.example.demoShop.mapper.ProductMapper;
 
@@ -22,12 +24,15 @@ public class OrderService {
 	private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
     private final CartService cartService;
+    private final OrderCancelMapper orderCancelMapper;
 
-    public OrderService(OrderMapper orderMapper, CategoryMapper categoryMapper, ProductMapper productMapper, CartService cartService) {
+    public OrderService(OrderMapper orderMapper, CategoryMapper categoryMapper, ProductMapper productMapper, 
+    					CartService cartService, OrderCancelMapper orderCancelMapper) {
         this.orderMapper = orderMapper;
         this.categoryMapper = categoryMapper;
         this.productMapper = productMapper;
         this.cartService = cartService;
+        this.orderCancelMapper = orderCancelMapper;
     }
 
     @Transactional
@@ -174,8 +179,9 @@ public class OrderService {
         return orders;
     }
     
+    //주문 취소
     @Transactional
-    public int cancelOrder(int orderNo) {
+    public int cancelOrder(int orderNo, String reason) {
         if (orderNo <= 0) {
             throw new IllegalArgumentException("주문 번호는 1 이상이어야 합니다.");
         }
@@ -196,6 +202,24 @@ public class OrderService {
                 throw new IllegalArgumentException("재고 복구에 실패했습니다.");
             }
         }
+        
+        OrderCancelDTO cancelDTO = new OrderCancelDTO();
+        cancelDTO.setOrderNo(order.getNo());
+        cancelDTO.setProductNo(order.getProductNo());
+        cancelDTO.setMemberNo(order.getMemberNo());
+        cancelDTO.setProductTitle(order.getTitle());
+        cancelDTO.setProductCount(order.getCount());
+        cancelDTO.setProductPrice(order.getProductPrice());
+        cancelDTO.setDeliPrice(order.getDeliPrice());
+        cancelDTO.setTotalPrice(order.getTotalPrice());
+        cancelDTO.setPayPrice(order.getPayPrice());
+        cancelDTO.setState("COMPLETED");
+        cancelDTO.setReason(reason != null ? reason : "고객 요청");
+
+        int cancelResult = orderCancelMapper.insertOrderCancel(cancelDTO);
+        if (cancelResult <= 0) {
+            throw new IllegalArgumentException("취소 데이터 저장에 실패했습니다.");
+        }
 
         CartDTO cart = new CartDTO();
         cart.setMemberNo(order.getMemberNo());
@@ -210,6 +234,26 @@ public class OrderService {
 
         return deleteResult;
     }
+    
+    //주문 취소(order_id)
+    @Transactional
+    public int cancelOrdersByOrderId(String orderId, String reason) {
+        if (orderId == null || orderId.trim().isEmpty()) {
+            throw new IllegalArgumentException("주문 ID는 필수입니다.");
+        }
+
+        List<OrderDTO> orders = orderMapper.selectOrdersByOrderId(orderId);
+        if (orders.isEmpty()) {
+            throw new IllegalArgumentException("주문 ID에 해당하는 주문이 없습니다: " + orderId);
+        }
+
+        int result = 0;
+        for (OrderDTO order : orders) {
+            result += cancelOrder(order.getNo(), reason);
+        }
+
+        return result;
+    }
 
     public OrderDTO selectOrderByNo(int no) {
         if (no <= 0) {
@@ -222,11 +266,11 @@ public class OrderService {
         return order;
     }
 
-    public OrderDTO selectOrderByOrderId(String orderId) {
+    public List<OrderDTO> selectOrdersByOrderId(String orderId) {
         if (orderId == null || orderId.isEmpty()) {
             throw new IllegalArgumentException("주문 ID는 필수입니다.");
         }
-        OrderDTO order = orderMapper.selectOrderByOrderId(orderId);
+        List<OrderDTO> order = orderMapper.selectOrdersByOrderId(orderId);
         if (order == null) {
             throw new IllegalArgumentException("주문 ID " + orderId + "에 해당하는 주문이 없습니다.");
         }

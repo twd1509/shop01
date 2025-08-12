@@ -55,9 +55,9 @@ public class OrderController {
 
     //주문 취소
     @PostMapping("/cancel/{orderNo}")
-    public ResponseEntity<?> cancelOrder(@PathVariable int orderNo) {
+    public ResponseEntity<?> cancelOrder(@PathVariable int orderNo, @RequestBody(required = false) String reason) {
         try {
-            int result = orderService.cancelOrder(orderNo);
+            int result = orderService.cancelOrder(orderNo, reason);
             
             if (result > 0) {
                 return ResponseEntity.ok("주문이 취소되었습니다.");
@@ -141,6 +141,20 @@ public class OrderController {
             }
             
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주문을 찾을 수 없습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+    
+    //주문 취소(order_id)
+    @PostMapping("/cancel-by-order-id/{orderId}")
+    public ResponseEntity<?> cancelOrdersByOrderId(@PathVariable String orderId, @RequestBody(required = false) String reason) {
+        try {
+            int result = orderService.cancelOrdersByOrderId(orderId, reason);
+            if (result > 0) {
+                return ResponseEntity.ok("주문이 취소되었습니다. 취소된 주문 수: " + result);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("주문 취소에 실패했습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

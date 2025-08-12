@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demoShop.mapper.OrderCancelMapper">
+
+    <resultMap id="OrderCancelResultMap" type="com.example.demoShop.dto.OrderCancelDTO">
+        <id property="no" column="no"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="productNo" column="product_no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="productTitle" column="product_title"/>
+        <result property="productCount" column="product_count"/>
+        <result property="productPrice" column="product_price"/>
+        <result property="deliPrice" column="deli_price"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="payPrice" column="pay_price"/>
+        <result property="state" column="state"/>
+        <result property="reason" column="reason"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="uptDate" column="upt_date"/>
+    </resultMap>
+
+    <!-- 주문 취소 등록 -->
+    <insert id="insertOrderCancel" parameterType="com.example.demoShop.dto.OrderCancelDTO" useGeneratedKeys="true" keyProperty="no">
+        <![CDATA[
+            INSERT INTO order_cancel (order_no, product_no, member_no, product_title, product_count, product_price, deli_price, total_price, pay_price, state, reason, reg_date, upt_date)
+            VALUES (#{orderNo}, #{productNo}, #{memberNo}, #{productTitle}, #{productCount}, #{productPrice}, #{deliPrice}, #{totalPrice}, #{payPrice}, #{state}, #{reason}, NOW(), NOW())
+        ]]>
+    </insert>
+
+    <!-- 주문 취소 단일 조회 -->
+    <select id="selectOrderCancelByNo" parameterType="int" resultMap="OrderCancelResultMap">
+        SELECT no, order_no, product_no, member_no, product_title, product_count, product_price, deli_price, total_price, pay_price, state, reason, reg_date, upt_date
+        FROM order_cancel
+        WHERE no = #{no}
+    </select>
+
+    <!-- 주문별 취소 목록 조회 -->
+    <select id="selectOrderCancelsByOrderNo" parameterType="int" resultMap="OrderCancelResultMap">
+        SELECT no, order_no, product_no, member_no, product_title, product_count, product_price, deli_price, total_price, pay_price, state, reason, reg_date, upt_date
+        FROM order_cancel
+        WHERE order_no = #{orderNo}
+        ORDER BY reg_date DESC
+    </select>
+
+    <!-- 회원별 취소 목록 조회 -->
+    <select id="selectOrderCancelsByMemberNo" parameterType="int" resultMap="OrderCancelResultMap">
+        SELECT no, order_no, product_no, member_no, product_title, product_count, product_price, deli_price, total_price, pay_price, state, reason, reg_date, upt_date
+        FROM order_cancel
+        WHERE member_no = #{memberNo}
+        ORDER BY reg_date DESC
+    </select>
+    
+    <!--상태 수정-->
+    <update id="updateOrderCancelState" parameterType="com.example.demoShop.dto.OrderCancelDTO">
+        <![CDATA[
+            UPDATE order_cancel
+            SET state = #{state}, upt_date = NOW()
+            WHERE no = #{no}
+        ]]>
+    </update>
+
+    <!-- 주문 취소 삭제 -->
+    <delete id="deleteOrderCancel" parameterType="int">
+        DELETE FROM order_cancel WHERE no = #{no}
+    </delete>
+</mapper>
