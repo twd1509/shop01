@@ -13,10 +13,12 @@ public interface OrderMapper {
     OrderDTO selectOrderByNo(int no);
     List<OrderDTO> selectOrdersByOrderId(String orderId);
     List<OrderDTO> selectOrdersByMemberNo(int memberNo);
-    List<OrderDTO> selectAllOrders();
+    List<OrderDTO> selectAllOrders(Map<String, Object> params);
     List<OrderDTO> selectOrdersByState(String state);
-    List<OrderDTO> searchOrders(Map<String, String> params);
+    List<OrderDTO> searchOrders(Map<String, Object> params);
     int updateOrderState(Map<String, Object> params);
     int updateOrderDelivery(OrderDTO orderDTO);
     int deleteOrder(int no);
+    int countAllOrders();
+    int countOrders(Map<String, Object> params);
 }

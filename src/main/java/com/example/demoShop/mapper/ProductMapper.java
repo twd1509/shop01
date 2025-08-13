@@ -1,6 +1,7 @@
 package com.example.demoShop.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,10 +18,12 @@ public interface ProductMapper {
 	//재고 수정
 	int updateProductStock(ProductDTO productDTO);
 	//전체 상품
-	List<ProductDTO> selectAllProduct();
+	List<ProductDTO> selectAllProduct(Map<String, Object> params); // 페이징 및 정렬
 	//상품 검색
 	List<ProductDTO> selectProductByTitle(String title);	//상품명
 	List<ProductDTO> selectProductById(String id);			//상품아이디
 	List<ProductDTO> selectProductByNo(int no);				//no
-	List<ProductDTO> selectProduct(String keyword);			//전체 검색
+	List<ProductDTO> selectProduct(Map<String, Object> params); // 검색, 페이징, 정렬
+	int countAllProducts();
+    int countProducts(String keyword);
 }

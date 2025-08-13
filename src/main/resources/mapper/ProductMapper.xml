@@ -20,16 +20,30 @@
         <result property="sort" column="sort"/>
     </resultMap>
 	<!--전체 상품 조회-->
-	<select id="selectAllProduct" resultMap="ProductResultMap">
-		SELECT * FROM product
-	</select>
+	<select id="selectAllProduct" resultType="com.example.demoShop.dto.ProductDTO" parameterType="map">
+        SELECT * FROM product
+        ORDER BY
+        <choose>
+            <when test="sort == 'price'">price</when>
+            <when test="sort == 'title'">title</when>
+            <otherwise>reg_date</otherwise>
+        </choose>
+        ${order, jdbcType=VARCHAR}
+        LIMIT #{size, jdbcType=INTEGER} OFFSET #{offset, jdbcType=INTEGER}
+    </select>
 	<!--상품 검색(전체)-->
 	<select id="selectProduct" resultMap="ProductResultMap">
-		<![CDATA[
-			SELECT * FROM product 
-			WHERE REPLACE(title, ' ', '') LIKE CONCAT('%', #{keyword}, '%')
-			OR id LIKE CONCAT('%', #{keyword}, '%')
-		]]>
+		SELECT * FROM product 
+		WHERE REPLACE(title, ' ', '') LIKE CONCAT('%', #{keyword}, '%')
+		OR id LIKE CONCAT('%', #{keyword}, '%')
+		ORDER BY
+        <choose>
+            <when test="sort == 'price'">price</when>
+            <when test="sort == 'title'">title</when>
+            <otherwise>reg_date</otherwise>
+        </choose>
+        ${order, jdbcType=VARCHAR}
+        LIMIT #{size, jdbcType=INTEGER} OFFSET #{offset, jdbcType=INTEGER}
 	</select>
 	<!--상품 검색(no)-->
 	<select id="selectProductByNo" resultMap="ProductResultMap">
@@ -37,6 +51,16 @@
 			SELECT * FROM product WHERE no = #{no}
 		]]>
 	</select>
+	<!--전체 상품 개수-->
+	<select id="countAllProducts" resultType="int">
+        SELECT COUNT(*) FROM product
+    </select>
+	<!--검색 시 상품 총 개수-->
+    <select id="countProducts" resultType="int">
+        SELECT COUNT(*) FROM product
+        WHERE REPLACE(title, ' ', '') LIKE CONCAT('%', #{keyword}, '%')
+        OR id LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 	<!--상품 검색(상품명)-->
 	<select id="selectProductByTitle" resultMap="ProductResultMap">
 		<![CDATA[

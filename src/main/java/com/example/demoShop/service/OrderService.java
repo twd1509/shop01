@@ -185,6 +185,12 @@ public class OrderService {
         if (orderNo <= 0) {
             throw new IllegalArgumentException("주문 번호는 1 이상이어야 합니다.");
         }
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("no", orderNo);
+        params.put("state", "취소요청");
+        params.put("cancelReason", reason);
+        int result = orderMapper.updateOrderState(params);
 
         OrderDTO order = orderMapper.selectOrderByNo(orderNo);
         if (order == null) {
@@ -203,8 +209,39 @@ public class OrderService {
             }
         }
         
+//        OrderCancelDTO cancelDTO = new OrderCancelDTO();
+//        cancelDTO.setOrderNo(order.getNo());
+//        cancelDTO.setProductNo(order.getProductNo());
+//        cancelDTO.setMemberNo(order.getMemberNo());
+//        cancelDTO.setProductTitle(order.getTitle());
+//        cancelDTO.setProductCount(order.getCount());
+//        cancelDTO.setProductPrice(order.getProductPrice());
+//        cancelDTO.setDeliPrice(order.getDeliPrice());
+//        cancelDTO.setTotalPrice(order.getTotalPrice());
+//        cancelDTO.setPayPrice(order.getPayPrice());
+//        cancelDTO.setState("COMPLETED");
+//        cancelDTO.setReason(reason != null ? reason : "고객 요청");
+        
+//        int cancelResult = orderCancelMapper.insertOrderCancel(cancelDTO);
+//        if (cancelResult <= 0) {
+//            throw new IllegalArgumentException("취소 데이터 저장에 실패했습니다.");
+//        }
+//
+//        CartDTO cart = new CartDTO();
+//        cart.setMemberNo(order.getMemberNo());
+//        cart.setProductNo(order.getProductNo());
+//        cart.setCount(order.getCount());
+//        cartService.insertCart(cart);
+//
+//        int deleteResult = orderMapper.deleteOrder(orderNo);
+//        if (deleteResult <= 0) {
+//            throw new IllegalArgumentException("주문 삭제에 실패했습니다.");
+//        }
+        
+//        return deleteResult;
+        
         OrderCancelDTO cancelDTO = new OrderCancelDTO();
-        cancelDTO.setOrderNo(order.getNo());
+        cancelDTO.setOrderNo(orderNo);
         cancelDTO.setProductNo(order.getProductNo());
         cancelDTO.setMemberNo(order.getMemberNo());
         cancelDTO.setProductTitle(order.getTitle());
@@ -213,26 +250,11 @@ public class OrderService {
         cancelDTO.setDeliPrice(order.getDeliPrice());
         cancelDTO.setTotalPrice(order.getTotalPrice());
         cancelDTO.setPayPrice(order.getPayPrice());
-        cancelDTO.setState("COMPLETED");
-        cancelDTO.setReason(reason != null ? reason : "고객 요청");
+        cancelDTO.setState("PENDING");
+        cancelDTO.setReason(reason);
+        orderCancelMapper.insertOrderCancel(cancelDTO);
 
-        int cancelResult = orderCancelMapper.insertOrderCancel(cancelDTO);
-        if (cancelResult <= 0) {
-            throw new IllegalArgumentException("취소 데이터 저장에 실패했습니다.");
-        }
-
-        CartDTO cart = new CartDTO();
-        cart.setMemberNo(order.getMemberNo());
-        cart.setProductNo(order.getProductNo());
-        cart.setCount(order.getCount());
-        cartService.insertCart(cart);
-
-        int deleteResult = orderMapper.deleteOrder(orderNo);
-        if (deleteResult <= 0) {
-            throw new IllegalArgumentException("주문 삭제에 실패했습니다.");
-        }
-
-        return deleteResult;
+        return result;
     }
     
     //주문 취소(order_id)
@@ -249,7 +271,29 @@ public class OrderService {
 
         int result = 0;
         for (OrderDTO order : orders) {
-            result += cancelOrder(order.getNo(), reason);
+            Map<String, Object> params = new HashMap<>();
+            params.put("no", order.getNo());
+            params.put("state", "취소요청");
+            params.put("cancelReason", reason);
+            result += orderMapper.updateOrderState(params);
+
+            ProductDTO product = productMapper.selectProductByNo(order.getProductNo()).get(0);
+            product.setStock(product.getStock() + order.getCount());
+            productMapper.updateProductStock(product);
+
+            OrderCancelDTO cancelDTO = new OrderCancelDTO();
+            cancelDTO.setOrderNo(order.getNo());
+            cancelDTO.setProductNo(order.getProductNo());
+            cancelDTO.setMemberNo(order.getMemberNo());
+            cancelDTO.setProductTitle(order.getTitle());
+            cancelDTO.setProductCount(order.getCount());
+            cancelDTO.setProductPrice(order.getProductPrice());
+            cancelDTO.setDeliPrice(order.getDeliPrice());
+            cancelDTO.setTotalPrice(order.getTotalPrice());
+            cancelDTO.setPayPrice(order.getPayPrice());
+            cancelDTO.setState("PENDING");
+            cancelDTO.setReason(reason);
+            orderCancelMapper.insertOrderCancel(cancelDTO);
         }
 
         return result;
@@ -284,8 +328,14 @@ public class OrderService {
         return orderMapper.selectOrdersByMemberNo(memberNo);
     }
 
-    public List<OrderDTO> selectAllOrders() {
-        return orderMapper.selectAllOrders();
+    public List<OrderDTO> selectAllOrders(int page, int size, String sort, String order) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("offset", page * size);
+        params.put("size", size);
+        params.put("sort", sort);
+        params.put("order", order);
+        
+        return orderMapper.selectAllOrders(params);
     }
 
     public List<OrderDTO> selectOrdersByState(String state) {
@@ -307,27 +357,27 @@ public class OrderService {
         return orderMapper.selectOrdersByState(state);
     }
 
-    public List<OrderDTO> searchOrders(String searchType, String keyword) {
-        if (searchType == null || keyword == null || searchType.isEmpty() || keyword.isEmpty()) {
-            throw new IllegalArgumentException("검색 유형과 키워드는 필수입니다.");
-        }
-        // 유효한 검색 유형인지 검증
-        String[] validSearchTypes = {"orderId", "email", "name"};
-        boolean isValidSearchType = false;
-        for (String validType : validSearchTypes) {
-            if (validType.equals(searchType)) {
-                isValidSearchType = true;
-                break;
-            }
-        }
-        if (!isValidSearchType) {
-            throw new IllegalArgumentException("유효하지 않은 검색 유형입니다: " + searchType);
-        }
-
-        Map<String, String> params = new HashMap<>();
+    public List<OrderDTO> searchOrders(String searchType, String keyword, int page, int size, String sort, String order) {
+        Map<String, Object> params = new HashMap<>();
         params.put("searchType", searchType);
         params.put("keyword", keyword);
+        params.put("offset", page * size);
+        params.put("size", size);
+        params.put("sort", sort);
+        params.put("order", order);
+        
         return orderMapper.searchOrders(params);
+    }
+    
+    public int countAllOrders() {
+        return orderMapper.countAllOrders();
+    }
+
+    public int countOrders(String searchType, String keyword) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("searchType", searchType);
+        params.put("keyword", keyword);
+        return orderMapper.countOrders(params);
     }
 
     @Transactional
@@ -356,6 +406,7 @@ public class OrderService {
         params.put("state", state);
         params.put("cancelReason", cancelReason);
         params.put("returnReason", returnReason);
+        
         return orderMapper.updateOrderState(params);
     }
 

@@ -59,9 +59,9 @@ public class OrderController {
 
     //주문 취소
     @PostMapping("/cancel/{orderNo}")
-    public ResponseEntity<?> cancelOrder(@PathVariable int orderNo, @RequestBody(required = false) String reason) {
+    public ResponseEntity<?> cancelOrder(@PathVariable int orderNo, @RequestBody Map<String, String> body) {
         try {
-            int result = orderService.cancelOrder(orderNo, reason);
+            int result = orderService.cancelOrder(orderNo, body.get("reason"));
             
             if (result > 0) {
                 return ResponseEntity.ok("주문이 취소되었습니다.");
@@ -75,10 +75,13 @@ public class OrderController {
 
     //전체 주문 조회
     @GetMapping("/list")
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> orders = orderService.selectAllOrders();
-        
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "reg_date") String sort,
+            @RequestParam(defaultValue = "DESC") String order) {
+    	
+        return ResponseEntity.ok(orderService.selectAllOrders(page, size, sort, order));
     }
     
     //회원별 주문 조회
@@ -96,11 +99,15 @@ public class OrderController {
     //주문 검색(전체, orderId, email, name)
     @GetMapping("/search")
     public ResponseEntity<?> searchOrders(
-            @RequestParam String searchType,
-            @RequestParam String keyword) {
+    		@RequestParam String searchType,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "reg_date") String sort,
+            @RequestParam(defaultValue = "DESC") String order) {
     	
         try {
-            List<OrderDTO> orders = orderService.searchOrders(searchType, keyword);
+            List<OrderDTO> orders = orderService.searchOrders(searchType, keyword, page, size, sort, order);
             
             return ResponseEntity.ok(orders);
         } catch (IllegalArgumentException e) {
@@ -112,12 +119,12 @@ public class OrderController {
     @PostMapping("/update/state/{no}")
     public ResponseEntity<?> updateOrderState(
             @PathVariable int no,
-            @RequestBody Map<String, String> request) {
+            @RequestBody Map<String, String> body) {
     	
         try {
-            String state = request.get("state");
-            String cancelReason = request.get("cancelReason");
-            String returnReason = request.get("returnReason");
+            String state = body.get("state");
+            String cancelReason = body.get("cancelReason");
+            String returnReason = body.get("returnReason");
             int result = orderService.updateOrderState(no, state, cancelReason, returnReason);
             
             if (result > 0) {
@@ -132,10 +139,7 @@ public class OrderController {
 
     //주문 배송 정보 수정
     @PostMapping("/update/delivery/{no}")
-    public ResponseEntity<?> updateOrderDelivery(
-            @PathVariable int no,
-            @RequestBody OrderDTO orderDTO) {
-    	
+    public ResponseEntity<?> updateOrderDelivery(@PathVariable int no, @RequestBody OrderDTO orderDTO) {
         try {
             orderDTO.setNo(no);
             int result = orderService.updateOrderDelivery(orderDTO);
@@ -169,10 +173,22 @@ public class OrderController {
     public ResponseEntity<?> getCancelListByMemberNo(@PathVariable int memberNo) {
       try {
         List<OrderCancelDTO> cancels = orderCancelMapper.selectOrderCancelsByMemberNo(memberNo);
+        
         return ResponseEntity.ok(cancels);
       } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
       }
+    }
+    
+    //주문 개수
+    @GetMapping("/count")
+    public ResponseEntity<Integer> countOrders(
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String keyword) {
+        if (searchType != null && keyword != null && !keyword.isEmpty()) {
+            return ResponseEntity.ok(orderService.countOrders(searchType, keyword));
+        }
+        return ResponseEntity.ok(orderService.countAllOrders());
     }
 
     //주문 삭제
