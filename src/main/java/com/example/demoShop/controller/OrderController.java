@@ -13,16 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demoShop.dto.OrderCancelDTO;
 import com.example.demoShop.dto.OrderDTO;
+import com.example.demoShop.mapper.OrderCancelMapper;
 import com.example.demoShop.service.OrderService;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 	private final OrderService orderService;
+	private final OrderCancelMapper orderCancelMapper;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderCancelMapper orderCancelMapper) {
         this.orderService = orderService;
+        this.orderCancelMapper = orderCancelMapper;
     }
 
     //주문 생성
@@ -76,7 +80,7 @@ public class OrderController {
         
         return ResponseEntity.ok(orders);
     }
-
+    
     //회원별 주문 조회
     @GetMapping("/member/{memberNo}")
     public ResponseEntity<?> getOrdersByMemberNo(@PathVariable int memberNo) {
@@ -158,6 +162,17 @@ public class OrderController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+    
+    //회원별 취소 목록
+    @GetMapping("/cancel-list/{memberNo}")
+    public ResponseEntity<?> getCancelListByMemberNo(@PathVariable int memberNo) {
+      try {
+        List<OrderCancelDTO> cancels = orderCancelMapper.selectOrderCancelsByMemberNo(memberNo);
+        return ResponseEntity.ok(cancels);
+      } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+      }
     }
 
     //주문 삭제
