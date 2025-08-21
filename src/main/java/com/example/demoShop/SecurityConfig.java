@@ -35,7 +35,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 사용, 세션 비활성화
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/members/**").permitAll() 		//인증 없이 접근 허용
-                .requestMatchers("/api/products/list").permitAll()
+                .requestMatchers("/api/products/list", "/api/products/count").permitAll()
                 .requestMatchers("/api/products/**").authenticated()	//인증 필요
                 .requestMatchers("/api/categories/**").authenticated()
                 .requestMatchers("/api/orders/**").authenticated()
